@@ -3,8 +3,8 @@ const Product = require('../models/product.model');
 exports.product_create = function (req, res) {
     let product = new Product(
         {
-            name: req.body.name,
-            price: req.body.price
+            text: req.body.text,
+            status: req.body.status,
         }
     );
 
@@ -18,24 +18,47 @@ exports.product_create = function (req, res) {
 
 exports.product_details = function (req, res) {
     Product.findById(req.params.id, function (err, product) {
-        if (err) { return next(err); }
+        if (err) { 
+            return next(err);
+         }
         res.send(product);
     })
 };
 
-exports.product_details_all = function (res) {
+exports.product_details_all = function (req, res) {
     Product.find({}, function (err, products) {
-        if (err) { return next(err); }
+        if (err) { 
+            return next(err); 
+        }
         res.send(products);
     })
 };
 
 exports.product_update = function (req, res) {
-    Product.findByIdAndUpdate(req.params.id, { $set: req.body }, function (err, product) {
+    Product.findByIdAndUpdate(req.params.id, { $set: {"status" : !req.body.status} }, function (err, product) {
+        if (err) {
+            return next(err);
+        } 
+        res.send(product);
+    });
+};
+
+exports.product_modify = function (req, res) {
+    Product.findByIdAndUpdate(req.params.id, { $set: {"text" : req.body.text} }, function (err, product) {
+        if (err) {
+            return next(err);
+        } 
+        console.log('PRODUCT', req.body.text)
+        res.send(product);
+    });
+};
+
+exports.product_update_all = function (req, res) {
+    Product.updateMany({}, function (err, products) {
         if (err) {
             return next(err);
         }
-        res.send(product);
+        res.send('Update successfully!');
     });
 };
 
@@ -46,4 +69,13 @@ exports.product_delete = function (req, res) {
     })
 };
 
+exports.product_delete_all = function (req, res) {
+    Product.deleteMany( { status: "true" }  , function (err, products) {
+        if (err) { 
+            return next(err);   
+        }
+        res.send(products);
+    })
+};
+ 
 
